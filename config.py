@@ -1,15 +1,15 @@
 # Dados de conexão com o switch no EVE-NG
 # LAB EVE-NG
-SWITCH_IP = "192.168.1.1"
+SWITCH_IP = "192.168.19.139"
 SWITCH_USERNAME = "admin"
-SWITCH_PASSWORD = "admin"
+SWITCH_PASSWORD = "admin123"
 SWITCH_SECRET = "admin"  # senha do modo enable, se houver
 
 # Dispositivo
 SWITCH_DEVICE_TYPE = "cisco_ios"
 
 # Hostname
-HOSTNAME_TARGET = "SWITCH_AUTOMATIZADO"
+HOSTNAME_TARGET = "SWITCH_LAB_R1"
 
 # VLANs do projeto
 VLANS = [
