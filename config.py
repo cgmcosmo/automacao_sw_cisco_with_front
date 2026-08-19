@@ -15,7 +15,7 @@ HOSTNAME_TARGET = "SWITCH_LAB_R1"
 VLANS = [
     {"id": 10, "name": "VLAN_DADOS"},
     {"id": 20, "name": "VLAN_VOZ"},
-    {"id": 50, "name": "VLAN_SEGURANÇA"},
+    {"id": 50, "name": "VLAN_SEGURANCA"},
 ]
 
 # Pasta onde os backups de configuração serão salvos
