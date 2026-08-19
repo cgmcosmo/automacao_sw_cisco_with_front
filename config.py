@@ -9,7 +9,7 @@ SWITCH_SECRET = "admin"  # senha do modo enable, se houver
 SWITCH_DEVICE_TYPE = "cisco_ios"
 
 # Hostname
-HOSTNAME_TARGET = "SWITCH_LAB_R1"
+HOSTNAME_TARGET = "SWITCH_AUTOMATIZADO_R1"
 
 # VLANs do projeto
 VLANS = [
