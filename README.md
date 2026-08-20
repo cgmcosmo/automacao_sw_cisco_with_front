@@ -77,11 +77,6 @@ O projeto cria por padrão as seguintes VLANs:
 | 20 | VLAN_VOZ        |
 | 50 | VLAN_SEGURANCA  |
 
-> **Nota:** o nome da VLAN 50 foi definido sem acentuação (`VLAN_SEGURANCA`
-> em vez de `VLAN_SEGURANÇA`) devido a limitações de compatibilidade entre
-> o terminal SSH e o IOS do laboratório, que causavam timeout na
-> negociação de comandos via Netmiko.
-
 ## Hostname aplicado
 
 Por padrão, o hostname alvo é `SWITCH_AUTOMATIZADO_R1` (definido em
