@@ -43,3 +43,22 @@ button {
 button:hover {
     background-color: #00374d;
 }
+
+.sucesso {
+    color: #1a7d1a;
+    font-weight: bold;
+}
+
+.alerta {
+    color: #c0392b;
+    font-weight: bold;
+}
+
+ul.alerta {
+    color: #c0392b;
+    font-weight: normal;
+}
+
+a {
+    color: #005073;
+}
