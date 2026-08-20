@@ -5,6 +5,7 @@ from vlan_config import configurar_vlans
 from hostname_config import configurar_hostname
 from backup import fazer_backup
 from validation import validar_configuracao
+from save_config import salvar_configuracao
 
 app = Flask(__name__)
 
@@ -50,6 +51,41 @@ def aplicar():
         vlans=vlans,
         backup=caminho_backup,
         validacao=resultado_validacao,
+        somente_validacao=False,
+    )
+
+
+@app.route("/salvar", methods=["POST"])
+def salvar():
+    """
+    Conecta no switch e salva a configuração atual na NVRAM (write memory).
+    Chamado somente após o usuário confirmar que a validação foi bem-sucedida.
+    """
+    conexao = conectar_switch()
+    resultado = salvar_configuracao(conexao)
+    desconectar_switch(conexao)
+
+    return render_template("salvo.html", resultado=resultado)
+
+
+@app.route("/validar")
+def validar():
+    """
+    Conecta no switch e valida a configuração ATUAL (sem aplicar nada),
+    comparando com os valores padrão definidos em config.py.
+    Útil para auditar o switch sem alterar nenhuma configuração.
+    """
+    conexao = conectar_switch()
+    resultado_validacao = validar_configuracao(conexao, config.VLANS, config.HOSTNAME_TARGET)
+    desconectar_switch(conexao)
+
+    return render_template(
+        "result.html",
+        hostname=config.HOSTNAME_TARGET,
+        vlans=config.VLANS,
+        backup=None,
+        validacao=resultado_validacao,
+        somente_validacao=True,
     )
 
 
