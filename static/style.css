@@ -1,21 +1,39 @@
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #fff159;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .container {
-    max-width: 600px;
-    margin: 0 auto;
+    width: 95%;
+    margin: 40px 0;
     background: white;
-    padding: 20px 30px;
+    padding: 20px 40px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    border-top: 6px solid #2968c8;
 }
 
 h1 {
-    color: #005073;
+    color: #2968c8;
+}
+
+h2, h3 {
+    color: #333333;
 }
 
 .vlan-item {
@@ -26,22 +44,31 @@ h1 {
 }
 
 input {
-    padding: 6px;
+    padding: 8px;
     margin: 4px 0;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #2968c8;
+    box-shadow: 0 0 0 2px rgba(41, 104, 200, 0.2);
 }
 
 button {
-    background-color: #005073;
+    background-color: #2968c8;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 10px 24px;
+    border-radius: 6px;
     cursor: pointer;
     margin-top: 15px;
+    font-weight: bold;
 }
 
 button:hover {
-    background-color: #00374d;
+    background-color: #1e4f9e;
 }
 
 .sucesso {
@@ -51,14 +78,3 @@ button:hover {
 
 .alerta {
     color: #c0392b;
-    font-weight: bold;
-}
-
-ul.alerta {
-    color: #c0392b;
-    font-weight: normal;
-}
-
-a {
-    color: #005073;
-}
