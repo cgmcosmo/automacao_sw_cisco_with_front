@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Configuração do Switch</h2>
+
+<form method="POST" action="/aplicar">
+
+    <h3>Hostname</h3>
+    <label for="hostname">Novo hostname:</label>
+    <input type="text" id="hostname" name="hostname" value="{{ hostname }}" required>
+
+    <h3>VLANs</h3>
+    {% for vlan in vlans %}
+    <div class="vlan-item">
+        <label>VLAN ID:</label>
+        <input type="number" name="vlan_id_{{ loop.index0 }}" value="{{ vlan.id }}" required>
+
+        <label>Nome:</label>
+        <input type="text" name="vlan_name_{{ loop.index0 }}" value="{{ vlan.name }}" required>
+    </div>
+    {% endfor %}
+    <input type="hidden" name="total_vlans" value="{{ vlans|length }}">
+
+    <button type="submit">Aplicar Configuração</button>
+</form>
+{% endblock %}
