@@ -39,8 +39,12 @@ operacional e teste de conectividade fim a fim.
 
 **Status:** completo — não apenas planejado, mas implementado e testado
 contra um ambiente real (EVE-NG), com a VPN estabelecida com sucesso e
-tráfego real confirmado entre as redes locais dos dois firewalls.
-[Uploading demo_automacao_vpn.wmv…]()
+tráfego real confirmado entre as redes locais dos dois firewalls (Video do processo)
+
+https://github.com/user-attachments/assets/552363d7-63ee-4e7f-9d6f-870d2b1926d3
+
+.
+
 
 📄 **Documento principal:** [`vpn_ipsec_fortigate_paloalto/vpn_ipsec_plan.md`](vpn_ipsec_fortigate_paloalto/vpn_ipsec_plan.md)
 — contém parâmetros da VPN, ferramentas/APIs, passos de automação,
