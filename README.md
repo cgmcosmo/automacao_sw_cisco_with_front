@@ -23,6 +23,10 @@ Um vídeo com o funcionamento completo do projeto (formulário, aplicação
 da configuração, validação, salvamento na NVRAM e detecção de
 divergência) está disponível em [`evidencias/demo_funcionamento.mp4`](evidencias/demo_funcionamento.mp4).
 
+
+https://github.com/user-attachments/assets/c9c735eb-a735-48f0-8586-c4c2e9a40dd9
+
+
 ---
 
 ## Parte 2 — VPN IPSec entre FortiGate e Palo Alto
