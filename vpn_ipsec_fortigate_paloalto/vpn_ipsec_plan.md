@@ -319,7 +319,117 @@ foi identificada uma limitação específica da imagem utilizada:
   certificado habilitada (idealmente com certificado assinado por uma CA
   confiável, não autoassinado), para garantir a confidencialidade do
   token de autenticação em trânsito.
-  
+## 8. Descobertas Práticas da Implementação no Laboratório
+
+A implementação dos scripts de automação contra o ambiente real (EVE-NG)
+revelou uma série de comportamentos específicos de cada fabricante que não
+eram evidentes apenas pela documentação teórica. Essas descobertas
+validam e enriquecem as "Considerações Específicas" da seção 4.
+
+### 8.1 FortiGate
+
+- **Limite de 15 caracteres no nome de interface/Phase 1**: o FortiOS
+  trunca silenciosamente nomes de interface (e, por consequência, de
+  Phase 1, que está atrelada a uma interface) acima de 15 caracteres,
+  sem retornar erro. Isso causou uma inconsistência entre o nome
+  configurado na Phase 2 (sem esse limite) e o nome real da interface/
+  Phase 1 (truncado), gerando falhas em cascata nas etapas seguintes
+  (rota, políticas). **Mitigação**: usar nomes de túnel com no máximo
+  15 caracteres em toda a automação (`VPN_FTGT_PA`, no lugar do nome
+  mais descritivo originalmente planejado).
+- **A Phase 1 cria a interface de túnel automaticamente**: ao criar um
+  objeto `vpn.ipsec/phase1-interface` via API, o FortiGate cria
+  implicitamente a interface de túnel associada (mesmo nome). Uma
+  tentativa de criar essa interface explicitamente antes da Phase 1
+  retorna erro de "objeto já existente" (`error: -5`). **Mitigação**:
+  a ordem correta é criar a Phase 1 primeiro, e em seguida usar um PUT
+  (atualização) na interface resultante para atribuir o IP do túnel -
+  não um POST (criação).
+- **Restrição de algoritmos por licença**: a imagem FortiGate VM64-KVM
+  de avaliação (sem licença/registro) disponibiliza apenas algoritmos
+  DES para propostas de Phase 1/Phase 2 de VPN IPSec - AES não aparece
+  como opção válida (confirmado via `set proposal ?` na CLI). Esse é
+  um comportamento intencional da Fortinet ligado a controles de
+  exportação de criptografia. **Mitigação**: os scripts foram
+  ajustados para usar `des-sha256` neste ambiente; em uma licença de
+  produção, o valor correto seria `aes256-sha256`, como originalmente
+  especificado na seção 1.4/1.5 deste documento.
+- **Modo DHCP sobrepõe IP estático silenciosamente**: ao configurar uma
+  interface via API enviando apenas o campo `ip`, sem alterar o `mode`,
+  o FortiGate mantém o modo `dhcp` (se já configurado) e ignora o IP
+  estático enviado, sem retornar erro. **Mitigação**: sempre enviar
+  `"mode": "static"` explicitamente no payload ao definir um IP fixo.
+- **Restrição de acesso administrativo HTTPS/SSH por licença**: a
+  mesma imagem de avaliação apresentou falhas de handshake TLS (HTTPS)
+  e resets intermitentes de conexão SSH na interface de management -
+  ambos contornados (HTTPS trocado por HTTP; SSH funcionou após uma
+  segunda tentativa, sugerindo instabilidade do serviço nesta imagem
+  não licenciada). Ver também a seção 7 (Notas de Implementação).
+
+### 8.2 Palo Alto
+
+- **`local_ip_address` do IKE Gateway exige a máscara de rede**: o
+  campo que define o IP local do gateway IKE não aceita apenas o
+  endereço IP puro (ex: `203.0.113.2`) - é necessário enviá-lo no
+  mesmo formato CIDR configurado na interface (`203.0.113.2/30`),
+  senão a API retorna erro de "referência inválida".
+- **Rotas estáticas para interfaces de túnel exigem next-hop
+  explícito**: diferente do que se poderia supor (já que uma interface
+  de túnel ponto-a-ponto não teria, a princípio, necessidade de um IP
+  de próximo salto), o PAN-OS rejeita rotas sem o campo `nexthop`
+  preenchido. **Mitigação**: usar `nexthop_type="ip-address"` com o
+  IP do peer remoto na rede do túnel (169.255.1.1, no caso do
+  FortiGate) como next-hop.
+- **Interfaces precisam ser associadas explicitamente ao Virtual
+  Router**: criar uma interface (de túnel ou física) não a torna
+  automaticamente elegível para roteamento - é necessário adicioná-la
+  à lista de interfaces do Virtual Router correspondente. Como o
+  Virtual Router "default" já continha outras interfaces
+  configuradas manualmente (ethernet1/2, ethernet1/3), a automação
+  precisou ler a lista atual antes de adicionar a nova interface,
+  para não sobrescrever as demais.
+- **Toda interface precisa de uma zona de segurança**: reflexo direto
+  do modelo de zonas do PAN-OS (já antecipado na seção 4) - tanto a
+  interface de túnel quanto a interface LAN precisaram de zonas
+  próprias (`VPN-ZONE` e `LAN-ZONE`, respectivamente) antes que
+  qualquer política de segurança pudesse referenciá-las.
+- **Comandos operacionais têm sintaxe distinta de comandos de
+  configuração**: `show vpn ike-sa` e `show vpn ipsec-sa` (sem
+  argumentos adicionais) são os comandos operacionais corretos para
+  checar o estado real do túnel - variações como `show vpn ipsec-sa
+  tunnel <nome>` (testadas inicialmente, por analogia à sintaxe de
+  outros comandos) retornam erro de sintaxe. Além disso, a resposta
+  XML desses comandos não inclui a palavra "Established" como texto -
+  essa formatação existe apenas na visualização em tabela do console
+  interativo, exigindo uma estratégia de validação baseada na
+  presença do túnel na resposta, não em correspondência textual de
+  status.
+
+### 8.3 Validação e Testes
+
+- **Bug de correspondência textual em validação de conectividade**: a
+  primeira versão do script de teste de ping usava a verificação
+  `"0% packet loss" in saida` para determinar sucesso - esse padrão
+  también corresponde a uma falha total (`"100% packet loss"` contém
+  a substring `"0% packet loss"`), gerando falsos positivos.
+  **Mitigação**: extração do percentual exato via expressão regular
+  (`re.search(r"(\d+)%\s*packet loss", saida)`), com comparação
+  numérica explícita.
+- **Ciclo completo de validação testado com sucesso**: o script
+  `validation.py` foi testado nos três estados possíveis - túnel
+  estabelecido (retornando status "VÁLIDO"), túnel derrubado
+  manualmente via `diagnose vpn ike gateway flush` (retornando três
+  alertas críticos precisos, identificando corretamente a Phase 2 do
+  FortiGate e as SAs do Palo Alto como não estabelecidas), e
+  reestabelecimento automático do túnel (a negociação IKE renegociou
+  sozinha, confirmando resiliência da configuração e validando que o
+  script realmente reflete o estado operacional, não um valor
+  estático).
+- **Teste de conectividade fim a fim confirmado**: após as correções,
+  o ping de VPC4 (10.10.10.0/24, atrás do FortiGate) para 10.20.20.2
+  (atrás do Palo Alto) obteve 0% de perda de pacotes, confirmando que
+  o tráfego de dados real atravessa o túnel configurado pela
+  automação - não apenas a negociação de controle (IKE/IPSec SA).  
 ## Autor
 
 Desenvolvido por [cgmcosmo](https://github.com/cgmcosmo) como parte de um
