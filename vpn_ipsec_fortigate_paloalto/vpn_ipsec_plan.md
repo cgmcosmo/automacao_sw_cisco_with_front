@@ -19,6 +19,8 @@ VPC4 (LAN Fortinet) -- R2 (switch L2) -- port1 [FortiGate]
                                         port2 [FortiGate] <--- WAN ---> [Palo Alto] ethernet1/2
                                                                               |
                                                             ethernet1/1 [Palo Alto] -- R3 (switch L2) -- VPC5 (LAN Palo Alto)
+<img width="1006" height="797" alt="image" src="https://github.com/user-attachments/assets/3787c44c-31cf-4b10-8a0f-a1919f510ad6" />
+
 ```
 
 - R2 e R3 atuam apenas como switches L2, sem participação na automação.
