@@ -154,9 +154,8 @@ python3 teste_validacao.py    # Valida VLANs e hostname aplicados
 
 ## Backup de configuração (Parte 1)
 
-Os backups são salvos localmente na pasta `backups/`, com o nome no
-formato `<HOSTNAME>_<AAAA-MM-DD>_<HH-MM-SS>.txt`. Não são versionados no
-Git (contêm dados de configuração do dispositivo).
+Os backups são salvos localmente na pasta [`backups/`](backups/), com o
+nome no formato `<HOSTNAME>_<AAAA-MM-DD>_<HH-MM-SS>.txt`.
 
 ## Autor
 
