@@ -1,7 +1,7 @@
 # Parâmetros de conexão com os firewalls (ajuste com os dados reais do seu lab)
 
 FORTIGATE_HOST = "192.168.19.141"
-FORTIGATE_API_TOKEN = "<TOKEN_API_FORTIGATE>"
+FORTIGATE_API_TOKEN = "fnG3mNkb0cq6g0gNpzNd7z06yb1ycs"
 
 PALOALTO_HOST = "192.168.19.142"
 PALOALTO_USERNAME = "admin"
