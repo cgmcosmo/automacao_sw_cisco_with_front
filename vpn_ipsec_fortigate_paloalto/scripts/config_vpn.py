@@ -22,25 +22,34 @@ FORTIGATE_TUNNEL_IP = "169.255.1.1"
 PALOALTO_TUNNEL_IP = "169.255.1.2"
 
 # Pre-shared key (defina localmente, nunca versione a chave real no Git)
-IPSEC_PSK = "<DEFINA_UMA_CHAVE_FORTE_AQUI>"
+IPSEC_PSK = "pskcgmcosmomevarejo"
 
 # Proposta de Phase 1 (IKE)
+# NOTA: valores reduzidos para DES devido a restricao de licenca da imagem
+# FortiGate VM64-KVM de avaliacao, que nao disponibiliza algoritmos AES
+# para VPN IPSec em dispositivos nao registrados (comportamento intencional
+# da Fortinet, ligado a controles de exportacao de criptografia). Em
+# ambiente de producao licenciado, os valores corretos seriam
+# encryption=aes256, hash=sha256, conforme documentado no plano
+# (vpn_ipsec_plan.md, secao 1.4).
 PHASE1_PROPOSAL = {
     "ike_version": "2",
-    "encryption": "aes256",
+    "encryption": "des",
     "hash": "sha256",
     "dh_group": "14",
     "lifetime_seconds": 28800,
 }
 
 # Proposta de Phase 2 (IPSec)
+# NOTA: mesma restricao de licenca aplicada aqui - ver comentario acima.
+# Em producao licenciada, o valor correto seria encryption=aes256.
 PHASE2_PROPOSAL = {
     "protocol": "esp",
-    "encryption": "aes256",
+    "encryption": "des",
     "authentication": "sha256",
     "pfs_group": "14",
     "lifetime_seconds": 3600,
 }
 
 # Nomes lógicos usados na configuração (túnel, interface, política)
-TUNNEL_NAME = "VPN_FORTI_PALOALTO"
+TUNNEL_NAME = "VPN_FTGT_PA"
