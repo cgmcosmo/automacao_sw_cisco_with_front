@@ -296,6 +296,30 @@ Esses scripts representam a implementação prática do plano descrito acima,
 e podem ser testados contra o ambiente de laboratório (FortiGate e Palo
 Alto no EVE-NG) descrito na seção "Topologia de Referência".
 
+## 7. Notas de Implementação no Ambiente de Laboratório
+
+Durante a implementação dos scripts de conexão contra o ambiente EVE-NG,
+foi identificada uma limitação específica da imagem utilizada:
+
+- **FortiGate (VM64-KVM, versão de avaliação/sem licença)**: o serviço
+  administrativo HTTPS (porta 443) não respondia corretamente às
+  requisições da API REST, mesmo com `allowaccess https` habilitado na
+  interface e Trusted Hosts configurado — a conexão era encerrada durante
+  o handshake TLS (`Connection reset by peer`), enquanto o acesso via
+  HTTP (porta 80) funcionava normalmente. Diagnóstico via CLI
+  (`diagnose sys tcpsock`) confirmou que nenhum processo estava
+  efetivamente escutando na porta 443, um comportamento conhecido em
+  algumas imagens de avaliação/não licenciadas do FortiGate.
+- Como solução para viabilizar o desenvolvimento e teste no ambiente de
+  laboratório, o script `fortigate_connection.py` foi ajustado para
+  utilizar **HTTP** em vez de HTTPS na comunicação com a API REST.
+- **Esta decisão é válida exclusivamente para o ambiente de laboratório
+  isolado.** Em um ambiente de produção real, a comunicação com a API do
+  FortiGate deve **sempre** utilizar HTTPS, com verificação de
+  certificado habilitada (idealmente com certificado assinado por uma CA
+  confiável, não autoassinado), para garantir a confidencialidade do
+  token de autenticação em trânsito.
+  
 ## Autor
 
 Desenvolvido por [cgmcosmo](https://github.com/cgmcosmo) como parte de um
